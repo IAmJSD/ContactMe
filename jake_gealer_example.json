@@ -1,0 +1,76 @@
+{
+    "page_description": {
+        "html_title": "Jake Gealer | {title}",
+        "title": "Contact Me",
+        "description": "Want to contact me? Follow the form below and I will get back to you!"
+    },
+    "forms": {
+        "\"I am from [company name here] and I'm looking to sell you [product here]\"": {
+            "type": "error",
+            "message": "I don't accept sales pitches via e-mail. Sorry!"
+        },
+        "I'd like to ask a question": {
+            "type": "form",
+            "warning": "I may not respond instantly; I will try and respond whenever possible.",
+            "children": {
+                "E-mail Address": {
+                    "type": "email",
+                    "required": true
+                },
+                "Question": {
+                    "type": "large_textbox",
+                    "required": true
+                }
+            }
+        },
+        "I want you to give a talk to people and I am in the Bristol area": {
+            "type": "form",
+            "warning": "Speaking is not my primary thing! You ask for this knowing that while I will give me 100%, it's not my primary job.",
+            "children": {
+                "E-mail Address": {
+                    "type": "email",
+                    "required": true
+                },
+                "Inquiry": {
+                    "type": "large_textbox",
+                    "required": true
+                }
+            }
+        },
+        "I'd like you to ask you to help us write some code on a contractual basis": {
+            "type": "form",
+            "warning": "Please be reasonable with the rate you're willing to give!",
+            "children": {
+                "E-mail Address": {
+                    "type": "email",
+                    "required": true
+                },
+                "Amount Per Hour (Please Specify Currency)": {
+                    "type": "small_textbox",
+                    "required": true
+                },
+                "Hours Per Week": {
+                    "type": "int",
+                    "required": false
+                },
+                "Inquiry": {
+                    "type": "large_textbox",
+                    "required": true
+                }
+            }
+        },
+        "Something else": {
+            "type": "form",
+            "children": {
+                "E-mail Address": {
+                    "type": "email",
+                    "required": true
+                },
+                "Inquiry": {
+                    "type": "large_textbox",
+                    "required": true
+                }
+            }
+        }
+    }
+}
