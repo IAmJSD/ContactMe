@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"time"
 
@@ -20,9 +21,12 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	j, err := r.JSON()
+	b, err := r.Bytes()
 	if err != nil {
 		panic(err)
 	}
-	Config = j.(BaseStructure)
+	err = json.Unmarshal(b, &Config)
+	if err != nil {
+		panic(err)
+	}
 }

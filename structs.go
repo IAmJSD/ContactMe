@@ -11,6 +11,7 @@ type PageDescription struct {
 type Form struct {
 	Type     string                             `json:"type"`
 	Warning  *string                            `json:"warning"`
+	Message  *string                            `json:"message"`
 	Children *map[string]map[string]interface{} `json:"children"`
 }
 
