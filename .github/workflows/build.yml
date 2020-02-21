@@ -1,0 +1,33 @@
+  
+name: Build and deploy to the Kubernetes cluster
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Login to Docker
+        run: docker login docker.pkg.github.com --username RepoOwner --password "${GITHUB_TOKEN}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and deploy it to Docker
+        run: docker build . -t docker.pkg.github.com/jakemakesstuff/contactme/app && docker push docker.pkg.github.com/jakemakesstuff/contactme/app
+
+      - name: Deploy changes to Kubernetes
+        run: |
+          wget --header "Content-Type: application/json" --header "Authorization: Bearer $DIGITALOCEAN_TOKEN" "https://api.digitalocean.com/v2/kubernetes/clusters/b9a8389f-646a-47ba-85ec-ec2de6866e75/kubeconfig"
+          kubectl --kubeconfig=./kubeconfig apply -f ./k8s/ingress.template.yml
+          kubectl --kubeconfig=./kubeconfig apply -f ./k8s/service.yml
+          kubectl --kubeconfig=./kubeconfig apply -f ./k8s/statefulset.yml
+          kubectl --kubeconfig=./kubeconfig rollout restart statefulset/contactme
+          rm ./kubeconfig
+        env:
+          DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}

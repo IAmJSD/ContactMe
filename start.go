@@ -3,13 +3,16 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"html"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/buaazp/fasthttprouter"
+	"github.com/mailgun/mailgun-go"
 	"github.com/valyala/fasthttp"
 )
 
@@ -25,7 +28,61 @@ func FormsRoute(ctx *fasthttp.RequestCtx) {
 
 // FormPost is used to handle a form being posted.
 func FormPost(ctx *fasthttp.RequestCtx) {
-	// TODO: Handle this.
+	// Get the JSON.
+	var m map[string]string
+	err := json.Unmarshal(ctx.Request.Body(), &m)
+	if err != nil {
+		ctx.Response.SetStatusCode(400)
+		return
+	}
+
+	// Get/delete __formName
+	FormName, ok := m["__formName"]
+	if !ok {
+		ctx.Response.SetStatusCode(400)
+		return
+	}
+	delete(m, "__formName")
+
+	// Get the form.
+	var f *Form
+	for _, v := range Config.Forms {
+		if v.Name == FormName {
+			f = &v
+			break
+		}
+	}
+	if f == nil {
+		ctx.Response.SetStatusCode(400)
+		return
+	}
+
+	// Do a sanity check of the form.
+	for i, v := range *f.Children {
+		Required, _ := v["required"].(bool)
+		_, ok := m[i]
+		if Required && !ok {
+			ctx.Response.SetStatusCode(400)
+			return
+		}
+	}
+
+	// Create the e-mail.
+	Email := "The form \"" + FormName + "\" has had an submission:\n"
+	for i, v := range m {
+		Email += "<hr /><p><b>" + html.EscapeString(i) + ":</b> " + html.EscapeString(v) + "</p>"
+	}
+
+	// Send the e-mail.
+	mg := mailgun.NewMailgun(os.Getenv("MAILGUN_DOMAIN"), os.Getenv("MAILGUN_API_KEY"))
+	mg.SetAPIBase("https://api.eu.mailgun.net/v3")
+	msg := mg.NewMessage(os.Getenv("FROM_ADDRESS"), "Form submitted: "+FormName, "", os.Getenv("TO_ADDRESS"))
+	msg.SetHtml(Email)
+	_, _, err = mg.Send(msg)
+	if err != nil {
+		println(err.Error())
+		ctx.Response.SetStatusCode(500)
+	}
 }
 
 // ServeStatic is used to serve the static content.
@@ -72,8 +129,6 @@ func main() {
 	router.GET("/", ServeHome)
 	router.GET("/mount.js", ServeStatic("./ui/dist/mount.js"))
 	router.GET("/mount.js.map", ServeStatic("./ui/dist/mount.js.map"))
-	router.GET("/styles.css", ServeStatic("./ui/dist/styles.css"))
-	router.GET("/styles.css.map", ServeStatic("./ui/dist/styles.css.map"))
 
 	log.Fatal(fasthttp.ListenAndServe(":8080", router.Handler))
 }

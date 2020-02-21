@@ -4,12 +4,10 @@
   "description": "The UI for ContactMe.",
   "scripts": {
     "build:js": "parcel build ./src/mount.js",
-    "build:css": "parcel build ./src/styles.scss",
-    "build": "npm run build:js && npm run build:css"
+    "build": "npm run build:js"
   },
   "devDependencies": {
-    "parcel-bundler": "1.12.4",
-    "sass": "^1.25.0"
+    "parcel-bundler": "1.12.4"
   },
   "author": "Jake Gealer",
   "license": "MPL-2.0",

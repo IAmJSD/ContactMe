@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: contactme
+spec:
+  replicas: 2
+  serviceName: contactme
+  selector:
+    matchLabels:
+      run: contactme
+  template:
+    metadata:
+      labels:
+        run: contactme
+    spec:
+      containers:
+        - name: contactme
+          image: docker.pkg.github.com/jakemakesstuff/contactme/app:latest
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: CONFIG_URL
+              valueFrom:
+                secretKeyRef:
+                  name: contactme
+                  key: config_url
+            - name: MAILGUN_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: contactme
+                  key: mailgun_domain
+            - name: MAILGUN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: contactme
+                  key: mailgun_api_key
+            - name: FROM_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: contactme
+                  key: from_address
+            - name: TO_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: contactme
+                  key: to_address
+      imagePullSecrets:
+        - name: github

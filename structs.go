@@ -9,6 +9,7 @@ type PageDescription struct {
 
 // Form is a form in the structure.
 type Form struct {
+	Name     string                             `json:"name"`
 	Type     string                             `json:"type"`
 	Warning  *string                            `json:"warning"`
 	Message  *string                            `json:"message"`
@@ -18,5 +19,6 @@ type Form struct {
 // BaseStructure is the structure at the base of the JSON.
 type BaseStructure struct {
 	PageDescription PageDescription `json:"page_description"`
-	Forms           map[string]Form `json:"forms"`
+	Forms           []Form          `json:"forms"`
+	Redirect        string          `json:"redirect"`
 }
