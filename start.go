@@ -67,6 +67,9 @@ func FormPost(ctx *fasthttp.RequestCtx) {
 		}
 	}
 
+	// Get the IP address.
+	m["IP Address"] = string(ctx.Request.Header.Peek("CF-Connecting-IP"))
+
 	// Create the e-mail.
 	Email := "The form \"" + FormName + "\" has had an submission:\n"
 	for i, v := range m {
